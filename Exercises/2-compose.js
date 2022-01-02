@@ -8,7 +8,7 @@ const compose = (...fns) => {
                 res = fn(res);
             } catch (error) {
                 composed['error'](error);
-                res = undefined
+                res = undefined;
                 break;
             }
         }
@@ -16,7 +16,7 @@ const compose = (...fns) => {
     }
     composed.on = (error, cb) => composed[error] = cb;
 
-    return composed
+    return composed;
 };
 
 module.exports = { compose };
