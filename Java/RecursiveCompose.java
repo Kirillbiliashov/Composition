@@ -1,21 +1,24 @@
 import java.util.Arrays;
 import java.util.function.Function;
+import java.util.*;
 
-public class MultipleCompose<T> implements Function<T, T> {
-  private Function<T, T>[] fns;
+public class RecursiveCompose<T> implements Function<T, T> {
+  private ArrayList<Function<T, T>> fns;
 
   @SafeVarargs
-  public MultipleCompose(Function<T, T>... fns) {
-    this.fns = fns;
+  public RecursiveCompose(Function<T, T>... fns) {
+    this.fns = new ArrayList<>(Arrays.asList(fns));
   }
 
   @Override
   public T apply(T t) {
-    T res = t;
-    for (int i = 0; i < fns.length; i++) {
-      res = fns[i].apply(res);
-    }
-    return res;
+    if (fns.size() == 0)
+      return null;
+    Function<T, T> fn = fns.remove(0);
+    T res = fn.apply(t);
+    if (fns.size() == 0)
+      return res;
+    return apply(res);
   }
 
   public static void main(String[] args) {
@@ -24,14 +27,12 @@ public class MultipleCompose<T> implements Function<T, T> {
     Function<String, String> lower = s -> s.toLowerCase();
     Function<String, String> trim = s -> s.trim();
 
-    MultipleCompose<String> capitalize = new MultipleCompose<>(trim, lower, upperCapital);
-
     String str = "    MARCUS AURELIUS    ";
     System.out.println(str);
     System.out.println("lower.apply(" + str + ") = " + lower.apply(str));
     System.out.println("upperCapital.apply(" + str + ") = " + upperCapital.apply(str));
-    System.out.println(capitalize.apply(str));
 
+    RecursiveCompose<String> capitalize = new RecursiveCompose<>(trim, lower, upperCapital);
+    System.out.println("capitalize.apply(" + str + ") = " + capitalize.apply(str));
   }
-
 }
